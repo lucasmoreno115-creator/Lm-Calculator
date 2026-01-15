@@ -2,9 +2,76 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>LM Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LM Calculator — Debug</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Interface será implementada após validação do score -->
+
+  <main style="max-width:480px;margin:auto;padding:16px">
+
+    <h1>LM Calculator (Debug)</h1>
+
+    <!-- BLOCO DADOS BÁSICOS -->
+    <label>Sexo</label>
+    <select id="sex">
+      <option value="male">Masculino</option>
+      <option value="female">Feminino</option>
+    </select>
+
+    <label>Idade</label>
+    <input id="age" type="number" value="30">
+
+    <label>Peso (kg)</label>
+    <input id="weight" type="number" value="90">
+
+    <label>Altura (cm)</label>
+    <input id="height" type="number" value="178">
+
+    <label>% Gordura corporal (opcional)</label>
+    <input id="bodyFat" type="number">
+
+    <!-- BLOCO ATIVIDADE -->
+    <label>Nível de atividade</label>
+    <select id="activityLevel">
+      <option value="sedentary">Sedentário</option>
+      <option value="light">Levemente ativo</option>
+      <option value="moderate">Moderado</option>
+      <option value="high">Alto</option>
+    </select>
+
+    <label>Frequência de treino (semana)</label>
+    <input id="trainingFrequency" type="number" value="3">
+
+    <label>
+      <input type="checkbox" id="strengthTraining" checked>
+      Musculação
+    </label>
+
+    <!-- BLOCO EXPECTATIVA -->
+    <label>Expectativa</label>
+    <select id="expectation">
+      <option value="conservative">Conservadora</option>
+      <option value="moderate">Moderada</option>
+      <option value="fast">Rápida</option>
+    </select>
+
+    <button id="calcBtn" style="margin-top:16px">Calcular</button>
+
+    <!-- RESULTADO -->
+    <section id="result" style="display:none;margin-top:24px;border-top:1px solid #ccc;padding-top:16px">
+      <h2>Resultado</h2>
+
+      <p id="score"></p>
+      <p id="classification"></p>
+      <p id="mainFactor"></p>
+
+      <pre id="debug"></pre>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
