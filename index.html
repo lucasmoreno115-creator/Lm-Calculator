@@ -4,87 +4,90 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LM Calculator — Debug v1.0</title>
-  
-<link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <main class="container">
+    <header class="card">
+      <h1>LM Calculator (Debug)</h1>
+      <p class="muted">Interface de QA. Core científico está em <code>/core</code>.</p>
+    </header>
 
-  <main>
-    <h1>LM Calculator (Debug)</h1>
-    <p><em>Interface exclusiva para testes manuais e validação de lógica.</em></p>
+    <section class="card">
+      <h2>Bloco 1 — Composição corporal</h2>
 
-    <div id="error"></div>
+      <label for="sex">Sexo</label>
+      <select id="sex" required>
+        <option value="male">Masculino</option>
+        <option value="female">Feminino</option>
+      </select>
 
-    <!-- ===============================
-         BLOCO 1 — COMPOSIÇÃO CORPORAL
-    ================================ -->
-    <label for="sex">Sexo</label>
-    <select id="sex">
-      <option value="male">Masculino</option>
-      <option value="female">Feminino</option>
-    </select>
+      <label for="age">Idade</label>
+      <input id="age" type="number" value="30" min="10" required>
 
-    <label for="age">Idade</label>
-    <input id="age" type="number" value="30" min="10" required>
+      <label for="weight">Peso (kg)</label>
+      <input id="weight" type="number" value="90" min="30" required>
 
-    <label for="weight">Peso (kg)</label>
-    <input id="weight" type="number" value="90" min="30" required>
+      <label for="height">Altura (cm)</label>
+      <input id="height" type="number" value="178" min="100" required>
 
-    <label for="height">Altura (cm)</label>
-    <input id="height" type="number" value="178" min="100" required>
+      <label for="bodyFat">% Gordura corporal (opcional)</label>
+      <input id="bodyFat" type="number" min="0" max="60" placeholder="Ex: 18">
+    </section>
 
-    <label for="bodyFat">% Gordura corporal (opcional — ainda não usada no score)</label>
-    <input id="bodyFat" type="number" min="0" max="60">
+    <section class="card">
+      <h2>Bloco 2 — Atividade física</h2>
 
-    <!-- ===============================
-         BLOCO 2 — ATIVIDADE FÍSICA
-    ================================ -->
-    <label for="activityLevel">Nível de atividade</label>
-    <select id="activityLevel">
-      <option value="sedentary">Sedentário</option>
-      <option value="light">Levemente ativo</option>
-      <option value="moderate">Moderado</option>
-      <option value="high">Alto</option>
-    </select>
+      <label for="activityLevel">Nível de atividade (declaração)</label>
+      <select id="activityLevel">
+        <option value="sedentary">Sedentário</option>
+        <option value="light">Levemente ativo</option>
+        <option value="moderate">Moderadamente ativo</option>
+        <option value="high">Muito ativo</option>
+      </select>
 
-    <label for="trainingFrequency">Frequência de treino (semana)</label>
-    <input id="trainingFrequency" type="number" value="3" min="0" max="7">
+      <label for="trainingFrequency">Frequência de treino (semana)</label>
+      <input id="trainingFrequency" type="number" value="3" min="0" max="7">
 
-    <label class="inline">
-      <input type="checkbox" id="strengthTraining" checked>
-      Musculação
-    </label>
+      <label class="checkbox">
+        <input type="checkbox" id="strengthTraining" checked>
+        Musculação
+      </label>
+    </section>
 
-    <!-- ===============================
-         BLOCO 3 — EXPECTATIVA
-    ================================ -->
-    <label for="expectation">Expectativa de resultado</label>
-    <select id="expectation">
-      <option value="conservative">Conservadora</option>
-      <option value="moderate">Moderada</option>
-      <option value="fast">Rápida</option>
-    </select>
+    <section class="card">
+      <h2>Bloco 3 — Expectativa</h2>
 
-    <!-- ===============================
-         AÇÃO
-    ================================ -->
-    <button id="calcBtn">Calcular</button>
+      <label for="expectation">Expectativa de resultado</label>
+      <select id="expectation">
+        <option value="conservative">Conservadora</option>
+        <option value="moderate">Moderada</option>
+        <option value="fast">Rápida</option>
+      </select>
 
-    <!-- ===============================
-         RESULTADO
-    ================================ -->
-    <section id="result" style="display:none;">
+      <button id="calcBtn" type="button">Calcular</button>
+    </section>
+
+    <section id="result" class="card" style="display:none;">
       <h2>Resultado</h2>
 
-      <p><strong id="score"></strong></p>
-      <p><em id="classification"></em></p>
-      <p id="mainFactor"></p>
+      <div class="resultLine">
+        <span>LM Score</span>
+        <strong id="score"></strong>
+      </div>
 
-      <div id="meta"></div>
-      <div id="blocks"></div>
+      <div class="resultLine">
+        <span>Classificação</span>
+        <strong id="classification"></strong>
+      </div>
 
-      <h3>Debug (JSON)</h3>
-      <pre id="debug"></pre>
+      <p id="mainFactor" class="muted"></p>
+
+      <details class="debug">
+        <summary>Debug (JSON)</summary>
+        <pre id="debug"></pre>
+      </details>
     </section>
   </main>
 
