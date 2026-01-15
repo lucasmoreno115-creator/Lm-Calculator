@@ -1,8 +1,7 @@
 /**
-* BLOCO 1 - COMPOSIÇÃO CORPORAL (até 35pts de penalização)
-*/
-
-* Implementa o lock v0.7:
+ * BLOCO 1 — COMPOSIÇÃO CORPORAL (até 35 pts de penalização)
+ *
+ * Implementa o lock v0.7:
  * - Penaliza risco metabólico estrutural
  * - Não premia BF baixo
  */
@@ -13,50 +12,52 @@ export function block1BodyComposition(d) {
 
   const bmi = calcBMI(d.weight, d.height);
 
-  // Thresholds educacionais. (não são “diagnóstico”)
   const hasBodyFat = d.bodyFat !== undefined && Number.isFinite(d.bodyFat);
 
   const bfHigh =
     hasBodyFat &&
-    (
-      (d.sex === "male" && d.bodyFat >= 30) ||
-      (d.sex === "female" && d.bodyFat >= 38)
-    );
+    ((d.sex === "male" && d.bodyFat >= 30) ||
+      (d.sex === "female" && d.bodyFat >= 38));
 
   // Penalização por categoria (aproxima o lock)
   if (bmi >= 35) {
     penalty += 30;
-    reasons.push("Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade.");
+    reasons.push(
+      "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade."
+    );
   } else if (bmi >= 30) {
     penalty += 20;
-    reasons.push("Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora.");
+    reasons.push(
+      "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora."
+    );
   } else if (bmi >= 25) {
-    // Sobrepeso leve: depende do BF quando disponível
     penalty += bfHigh ? 10 : 5;
-    reasons.push(bfHigh
-      ? "Sobrepeso com gordura elevada sugere risco metabólico moderado."
-      : "Sobrepeso leve: risco metabólico pode exigir ajustes graduais."
+    reasons.push(
+      bfHigh
+        ? "Sobrepeso com gordura elevada sugere risco metabólico moderado."
+        : "Sobrepeso leve: risco metabólico pode exigir ajustes graduais."
     );
   }
 
   if (d.age >= 45) {
     penalty += 5;
-    reasons.push("Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco).");
+    reasons.push(
+      "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco)."
+    );
   }
 
   // Teto do bloco
   penalty = Math.min(penalty, 35);
 
-  // Se não tem BF: educar (leve penalização já prevista no lock conceitual)
+  // Se não tem BF: educar (sem inventar 0%)
   if (!hasBodyFat) {
-    // Não altera muito o score, mas educa
     reasons.push("Sem % de gordura: risco metabólico é estimado com menor precisão.");
   }
 
   return {
     penalty,
     reasons,
-    meta: { bmi: round(bmi, 1), bfHigh: Boolean(bfHigh) },
+    meta: { bmi: round(bmi, 1), bfHigh: Boolean(bfHigh) }
   };
 }
 
