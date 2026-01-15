@@ -3,37 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LM Calculator — Debug</title>
+  <title>LM Calculator — Debug v1.0</title>
 
-  <link rel="stylesheet" href="style.css">
+  <!-- Estilo simples apenas para legibilidade -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+    }
+
+    main {
+      max-width: 480px;
+      margin: auto;
+      padding: 16px;
+      background: #fff;
+      border-radius: 8px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      margin-top: 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    section#result {
+      margin-top: 24px;
+      border-top: 1px solid #ccc;
+      padding-top: 16px;
+    }
+
+    pre {
+      background: #eee;
+      padding: 8px;
+      overflow-x: auto;
+    }
+  </style>
 </head>
 <body>
 
-  <main style="max-width:480px;margin:auto;padding:16px">
-
+  <main>
     <h1>LM Calculator (Debug)</h1>
+    <p><em>Interface exclusiva para testes manuais e validação de lógica.</em></p>
 
-    <!-- BLOCO DADOS BÁSICOS -->
-    <label>Sexo</label>
+    <!-- ===============================
+         BLOCO 1 — COMPOSIÇÃO CORPORAL
+    ================================ -->
+    <label for="sex">Sexo</label>
     <select id="sex">
       <option value="male">Masculino</option>
       <option value="female">Feminino</option>
     </select>
 
-    <label>Idade</label>
-    <input id="age" type="number" value="30">
+    <label for="age">Idade</label>
+    <input id="age" type="number" value="30" min="10" required>
 
-    <label>Peso (kg)</label>
-    <input id="weight" type="number" value="90">
+    <label for="weight">Peso (kg)</label>
+    <input id="weight" type="number" value="90" min="30" required>
 
-    <label>Altura (cm)</label>
-    <input id="height" type="number" value="178">
+    <label for="height">Altura (cm)</label>
+    <input id="height" type="number" value="178" min="100" required>
 
-    <label>% Gordura corporal (opcional)</label>
-    <input id="bodyFat" type="number">
+    <label for="bodyFat">% Gordura corporal (opcional — ainda não usada no score)</label>
+    <input id="bodyFat" type="number" min="0" max="60">
 
-    <!-- BLOCO ATIVIDADE -->
-    <label>Nível de atividade</label>
+    <!-- ===============================
+         BLOCO 2 — ATIVIDADE FÍSICA
+    ================================ -->
+    <label for="activityLevel">Nível de atividade</label>
     <select id="activityLevel">
       <option value="sedentary">Sedentário</option>
       <option value="light">Levemente ativo</option>
@@ -41,37 +89,45 @@
       <option value="high">Alto</option>
     </select>
 
-    <label>Frequência de treino (semana)</label>
-    <input id="trainingFrequency" type="number" value="3">
+    <label for="trainingFrequency">Frequência de treino (semana)</label>
+    <input id="trainingFrequency" type="number" value="3" min="0" max="7">
 
     <label>
       <input type="checkbox" id="strengthTraining" checked>
       Musculação
     </label>
 
-    <!-- BLOCO EXPECTATIVA -->
-    <label>Expectativa</label>
+    <!-- ===============================
+         BLOCO 3 — EXPECTATIVA
+    ================================ -->
+    <label for="expectation">Expectativa de resultado</label>
     <select id="expectation">
       <option value="conservative">Conservadora</option>
       <option value="moderate">Moderada</option>
       <option value="fast">Rápida</option>
     </select>
 
-    <button id="calcBtn" style="margin-top:16px">Calcular</button>
+    <!-- ===============================
+         AÇÃO
+    ================================ -->
+    <button id="calcBtn">Calcular</button>
 
-    <!-- RESULTADO -->
-    <section id="result" style="display:none;margin-top:24px;border-top:1px solid #ccc;padding-top:16px">
+    <!-- ===============================
+         RESULTADO
+    ================================ -->
+    <section id="result" style="display:none;">
       <h2>Resultado</h2>
 
-      <p id="score"></p>
-      <p id="classification"></p>
+      <p><strong id="score"></strong></p>
+      <p><em id="classification"></em></p>
       <p id="mainFactor"></p>
 
+      <h3>Debug (JSON)</h3>
       <pre id="debug"></pre>
     </section>
-
   </main>
 
-  <script src="script.js"></script>
+  <!-- JS carregado após DOM -->
+  <script src="script.js" defer></script>
 </body>
 </html>
