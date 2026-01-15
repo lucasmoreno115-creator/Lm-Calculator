@@ -1,191 +1,98 @@
-/* ===============================
-   LM CALCULATOR — DEBUG UI
-   ===============================
-   Este CSS é apenas para legibilidade
-   e inspeção de lógica. Não é UI final.
-*/
-
-/* Reset básico */
-* {
-  box-sizing: border-box;
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --accent:#2563eb;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f7f7f7;
-  color: #222;
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:16px;
 }
 
-/* Container principal */
-main {
-  max-width: 480px;
-  margin: 24px auto;
-  padding: 16px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.container{
+  max-width:520px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
-/* Títulos */
-h1 {
-  margin-top: 0;
-  font-size: 22px;
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
 }
 
-h2 {
-  font-size: 18px;
-  margin-bottom: 8px;
+h1{ margin:0 0 6px 0; font-size:1.4rem; }
+h2{ margin:0 0 10px 0; font-size:1.05rem; }
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:0.85rem;
+  color:var(--muted);
 }
 
-h3 {
-  font-size: 14px;
-  margin-top: 16px;
-  margin-bottom: 6px;
+input, select{
+  width:100%;
+  margin-top:6px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  font-size:1rem;
+  background:#fff;
 }
 
-/* Texto auxiliar */
-p {
-  font-size: 14px;
-  line-height: 1.4;
+.checkbox{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:12px;
+  color:var(--text);
 }
 
-/* Labels */
-label {
-  display: block;
-  margin-top: 12px;
-  font-weight: bold;
-  font-size: 14px;
+button{
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:var(--accent);
+  color:#fff;
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
 }
 
-/* Inputs gerais */
-input,
-select,
-button {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  font-size: 14px;
+.muted{ color:var(--muted); }
+
+.resultLine{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
 }
 
-/* Inputs numéricos */
-input[type="number"] {
-  appearance: textfield;
+.debug{
+  margin-top:14px;
 }
 
-/* Checkbox inline */
-label.inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  font-weight: normal;
-}
-
-label.inline input[type="checkbox"] {
-  width: auto;
-  margin: 0;
-}
-
-/* Botão */
-button {
-  margin-top: 16px;
-  font-size: 16px;
-  font-weight: bold;
-  background: #2d6cdf;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1f5acc;
-}
-
-/* ===============================
-   ERROS
-   =============================== */
-#error {
-  display: none;
-  margin-top: 12px;
-  padding: 10px;
-  border: 1px solid #d33;
-  background: #ffecec;
-  color: #900;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-/* ===============================
-   RESULTADO
-   =============================== */
-section#result {
-  margin-top: 24px;
-  border-top: 1px solid #ccc;
-  padding-top: 16px;
-}
-
-#score {
-  font-size: 18px;
-}
-
-#classification {
-  color: #555;
-}
-
-#mainFactor {
-  margin-top: 8px;
-}
-
-/* Meta info (mode / version) */
-#meta {
-  display: none;
-  margin-top: 8px;
-  padding: 8px;
-  background: #f2f2f2;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #444;
-}
-
-/* ===============================
-   BLOCO DE DETALHE (v0.9)
-   =============================== */
-#blocks {
-  display: none;
-  margin-top: 12px;
-  padding: 10px;
-  background: #f7f7f7;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-#blocks ul {
-  margin: 8px 0 0 18px;
-  padding: 0;
-}
-
-#blocks li {
-  margin-bottom: 6px;
-}
-
-#blocks code {
-  background: #e0e0e0;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-/* ===============================
-   DEBUG JSON
-   =============================== */
-pre {
-  background: #eeeeee;
-  padding: 8px;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-size: 12px;
-  line-height: 1.4;
+pre{
+  margin:10px 0 0 0;
+  padding:10px;
+  border-radius:12px;
+  background:#0b1020;
+  color:#e5e7eb;
+  overflow:auto;
+  font-size:0.85rem;
 }
