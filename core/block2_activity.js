@@ -40,9 +40,7 @@ if (!d.strengthTraining) {
 
 // Educação quando a execução não sustenta a declaração
 if (d.activityLevel === "moderate" && (d.trainingFrequency < 3 || !d.strengthTraining)) {
-  reasons.push(
-    "Atividade moderada exige consistência (frequência e musculação) para ser real na prática."
-  );
+  reasons.push("Atividade moderada exige consistência (frequência e musculação) para ser real na prática.");
 }
 
   // Sem musculação penaliza
