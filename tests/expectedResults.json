@@ -1,0 +1,5 @@
+{
+  "scenarioA": { "score": 50, "tolerance": 2 },
+  "scenarioB": { "score": 95, "tolerance": 2 },
+  "scenarioC": { "score": 80, "tolerance": 2 }
+}
