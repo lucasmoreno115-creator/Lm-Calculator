@@ -21,19 +21,18 @@ export function block3Expectation(d, b1, b2) {
   }
 
   // Base
-  penalty += 15;
-  reasons.push("Expectativa agressiva aumenta risco de frustração e abandono.");
+ penalty += 15;
+reasons.push("Expectativa agressiva aumenta risco de frustração e abandono.");
 
-  const lowActivityContext =
-    d.activityLevel === "sedentary" || d.trainingFrequency < 3;
+const lowActivityContext =
+  d.activityLevel === "sedentary" || d.trainingFrequency < 3;
 
-  if (lowActivityContext) {
-    // continua +10
-    penalty += 10;
-    reasons.push(
-      "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha."
-    );
-  }
+if (lowActivityContext) {
+  penalty += 10;
+  reasons.push(
+    "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha."
+  );
+}
   
   // Incompatível = combinação “ruim + ruim”
   const incompatible =
