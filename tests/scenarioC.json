@@ -1,1 +1,10 @@
-test - cenário C (ativo + expectativa agressiva)
+{
+  "sex": "male",
+  "age": 30,
+  "weight": 90,
+  "height": 178,
+  "activityLevel": "high",
+  "trainingFrequency": 6,
+  "strengthTraining": true,
+  "expectation": "fast"
+}
