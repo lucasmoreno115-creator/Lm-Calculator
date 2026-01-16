@@ -1,6 +1,6 @@
 ## v0.9 — Resultados esperados
 
-- Cenário A: ~55
+- Cenário A: ~50-55
 - Cenário B: 95–100
 - Cenário C: ~80
 
