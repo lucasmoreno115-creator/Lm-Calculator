@@ -56,21 +56,35 @@ function collectFormData() {
 // -------------------------------
 // Validação (somente UI)
 // -------------------------------
-function validateInput(d) {
-  const errs = [];
-
-  if (!d.sex) errs.push("Sexo é obrigatório.");
-  if (!Number.isFinite(d.age) || d.age <= 0) errs.push("Idade inválida.");
-  if (!Number.isFinite(d.weight) || d.weight <= 0) errs.push("Peso inválido.");
-  if (!Number.isFinite(d.height) || d.height <= 0) errs.push("Altura inválida.");
-
-  if (!Number.isFinite(d.trainingFrequency) || d.trainingFrequency < 0 || d.trainingFrequency > 7) {
-    errs.push("Frequência de treino deve estar entre 0 e 7.");
+function buildEducationalText(result) {
+  const band = pickBand(result.score);
+  if (!band) {
+    return result.reasons?.length
+      ? result.reasons.join(" ")
+      : "Nenhum fator de risco relevante identificado.";
   }
 
-  if (d.bodyFat !== undefined && (!Number.isFinite(d.bodyFat) || d.bodyFat < 0 || d.bodyFat > 60)) {
-    errs.push("% de gordura deve estar entre 0 e 60.");
-  }
+  const topReasons = Array.isArray(result.reasons) ? result.reasons.slice(0, 2) : [];
+  const reasonsLine = topReasons.length
+    ? `Principal fator: ${topReasons.join(" ")}`
+    : null;
+
+  const nextSteps = band.nextSteps.map((s) => `• ${s}`).join("\n");
+
+  return [
+    band.headline,
+    reasonsLine ? reasonsLine : null,
+    band.explanation,
+    "",
+    "Próximo passo:",
+    nextSteps,
+    "",
+    `Evite: ${band.dontDo}`,
+    "",
+    `Nota: ${LM_COPY_V11.disclaimers.coreFrozen}`,
+    `Nota: ${LM_COPY_V11.disclaimers.nonPrescriptive}`,
+  ].filter(Boolean).join("\n");
+}
 
   return errs;
 }
