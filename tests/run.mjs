@@ -7,8 +7,8 @@ import { calculateLMScore } from "../core/lmScoreEngine.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function readJson(relPath) {
-  const full = path.join(__dirname, relPath);
+function readJson(file) {
+  const full = path.join(__dirname, file);
   return JSON.parse(fs.readFileSync(full, "utf8"));
 }
 
@@ -21,51 +21,52 @@ function assertWithin(name, actual, expected, tolerance) {
       `[FAIL] ${name}: score=${actual} (expected ${expected} ±${tolerance} => ${min}..${max})`
     );
   }
-
   console.log(`[PASS] ${name}: score=${actual} (expected ${expected} ±${tolerance})`);
 }
 
 function assertReasonsNonEmptyWhenLow(name, result) {
-  // Regra educacional: se score < 85, deve haver pelo menos 1 razão
+  // Se score < 85, precisa explicar (educacional)
   if (result.score < 85 && (!Array.isArray(result.reasons) || result.reasons.length === 0)) {
-    throw new Error(`[FAIL] ${name}: score < 85 mas reasons está vazio (quebra explicabilidade)`);
+    throw new Error(`[FAIL] ${name}: score < 85 mas reasons está vazio`);
   }
   console.log(`[PASS] ${name}: reasons ok (${result.reasons.length})`);
 }
 
-function runScenario(scenarioKey) {
-  const input = readJson(`${scenarioKey}.json`);
-  return calculateLMScore(input);
+function runScenario(file, label) {
+  const input = readJson(file);
+  const result = calculateLMScore(input);
+  return { label, result };
 }
 
 function main() {
-  const expected = readJson("expectedResults.json");
+  const expected = {
+    scenarioA: { score: 50, tolerance: 2 },
+    scenarioB: { score: 95, tolerance: 2 },
+    scenarioC: { score: 80, tolerance: 2 }
+  };
 
   const cases = [
-    { key: "scenarioA", label: "Scenario A" },
-    { key: "scenarioB", label: "Scenario B" },
-    { key: "scenarioC", label: "Scenario C" }
+    { file: "scenarioA.json", key: "scenarioA", label: "Scenario A" },
+    { file: "scenarioB.json", key: "scenarioB", label: "Scenario B" },
+    { file: "scenarioC.json", key: "scenarioC", label: "Scenario C" }
   ];
 
   let failures = 0;
 
   for (const c of cases) {
     try {
-      const result = runScenario(c.key);
+      const { result, label } = runScenario(c.file, c.label);
       const exp = expected[c.key];
 
-      assertWithin(c.label, result.score, exp.score, exp.tolerance);
-      assertReasonsNonEmptyWhenLow(c.label, result);
-
-      // Debug opcional (descomente se quiser ver)
-      // console.log(result);
-    } catch (err) {
+      assertWithin(label, result.score, exp.score, exp.tolerance);
+      assertReasonsNonEmptyWhenLow(label, result);
+    } catch (e) {
       failures++;
-      console.error(String(err?.message || err));
+      console.error(String(e?.message || e));
     }
   }
 
-  if (failures > 0) {
+  if (failures) {
     console.error(`\n${failures} teste(s) falharam.`);
     process.exit(1);
   }
