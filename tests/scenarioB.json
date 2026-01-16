@@ -1,1 +1,10 @@
-test - cenário B (baixo risco metabólico)
+{
+  "sex": "female",
+  "age": 28,
+  "weight": 62,
+  "height": 165,
+  "activityLevel": "moderate",
+  "trainingFrequency": 5,
+  "strengthTraining": true,
+  "expectation": "conservative"
+}
