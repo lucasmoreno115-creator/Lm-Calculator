@@ -41,7 +41,7 @@ function runScenario(file, label) {
 function main() {
   const expected = {
     scenarioA: { score: 50, tolerance: 2 },
-    scenarioB: { score: 95, tolerance: 2 },
+    scenarioB: { score: 100, tolerance: 1 },
     scenarioC: { score: 80, tolerance: 2 }
   };
 
