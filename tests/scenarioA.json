@@ -1,1 +1,10 @@
-test - cenário A (sedentário + expectativa agressiva)
+{
+  "sex": "male",
+  "age": 30,
+  "weight": 90,
+  "height": 178,
+  "activityLevel": "sedentary",
+  "trainingFrequency": 3,
+  "strengthTraining": true,
+  "expectation": "fast"
+}
