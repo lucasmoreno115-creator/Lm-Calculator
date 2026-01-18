@@ -52,3 +52,56 @@ function classify(score) {
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
+
+function getNormalizedWeights(blockKeys) {
+  const cfg = (LM_WEIGHTS_V12 && LM_WEIGHTS_V12.blocks) ? LM_WEIGHTS_V12.blocks : {};
+  const weights = {};
+  let sum = 0;
+
+  for (const k of blockKeys) {
+    const w = Number(cfg[k]);
+    const v = Number.isFinite(w) && w > 0 ? w : 0;
+    weights[k] = v;
+    sum += v;
+  }
+
+  // fallback: pesos iguais
+  if (sum <= 0) {
+    const eq = 1 / blockKeys.length;
+    for (const k of blockKeys) weights[k] = eq;
+    return { weights, sum: 1 };
+  }
+
+  // normaliza para somar 1.0
+  for (const k of blockKeys) weights[k] = weights[k] / sum;
+  return { weights, sum: 1 };
+}
+
+/**
+ * Agregação ponderada por penalidade (compatível com engine punitivo).
+ * Mantém a lógica: score parte de 100 e só penaliza.
+ *
+ * Ideia:
+ * - Cada bloco calcula penalty (0..maxPenalty do bloco)
+ * - Aqui ponderamos o impacto de cada bloco pela config
+ * - Importante: isso muda score se você trocar o modo default.
+ *   Então v1.2 deve introduzir isso APENAS como modo opcional.
+ */
+function applyWeightsToPenalties(blocks) {
+  const keys = Object.keys(blocks);
+  const { weights } = getNormalizedWeights(keys);
+
+  let totalPenaltyWeighted = 0;
+
+  for (const k of keys) {
+    const b = blocks[k] || {};
+    const penalty = Number.isFinite(b.penalty) ? b.penalty : 0;
+
+    const w = weights[k];
+    b.weightApplied = w; // telemetria/QA
+
+    totalPenaltyWeighted += penalty * w;
+  }
+
+  return totalPenaltyWeighted;
+}
