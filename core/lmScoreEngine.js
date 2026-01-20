@@ -70,9 +70,9 @@ export function calculateLMScore(input, options = {}) {
 
     // Razões educacionais (flat)
     reasons: [
-      ...(Array.isArray(b1.reasons) ? b1.reasons : []),
-      ...(Array.isArray(b2.reasons) ? b2.reasons : []),
-      ...(Array.isArray(b3.reasons) ? b3.reasons : []),
+      ...normalizeReasons("body", b1.reasons),
+      ...normalizeReasons("activity", b2.reasons),
+      ...normalizeReasons("expectation", b3.reasons),
     ],
 
     // Debug por bloco + totais
@@ -90,6 +90,27 @@ function classify(score) {
   if (score >= 65) return "Risco metabólico leve";
   if (score >= 45) return "Risco metabólico moderado";
   return "Alto risco metabólico";
+}
+
+function normalizeReasons(block, reasons) {
+  if (!Array.isArray(reasons)) return [];
+
+  return reasons
+    .map((reason) => {
+      if (typeof reason === "string") {
+        return { code: null, text: reason, block };
+      }
+
+      if (reason && typeof reason === "object") {
+        const text = typeof reason.text === "string" ? reason.text : String(reason.text ?? "");
+        const code = typeof reason.code === "string" ? reason.code : null;
+        const reasonBlock = typeof reason.block === "string" ? reason.block : block;
+        return { code, text, block: reasonBlock };
+      }
+
+      return { code: null, text: String(reason), block };
+    })
+    .filter((reason) => reason.text);
 }
 
 function clamp(n, min, max) {

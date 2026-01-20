@@ -95,13 +95,15 @@ function buildEducationalText(result) {
   // Fallback seguro (se copy faltar por algum motivo)
   if (!band) {
     return result.reasons?.length
-      ? result.reasons.join(" ")
+      ? result.reasons.map((reason) => getReasonText(reason)).join(" ")
       : "Nenhum fator de risco relevante identificado.";
   }
 
   // Mostra 1–2 razões principais (se existirem), para não ficar genérico
   const topReasons = Array.isArray(result.reasons) ? result.reasons.slice(0, 2) : [];
-  const reasonsLine = topReasons.length ? `Principal fator: ${topReasons.join(" ")}` : null;
+  const reasonsLine = topReasons.length
+    ? `Principal fator: ${topReasons.map((reason) => getReasonText(reason)).join(" ")}`
+    : null;
 
   const nextSteps = band.nextSteps.map((s) => `• ${s}`).join("\n");
 
@@ -156,7 +158,7 @@ function buildPenaltyCard(label, block) {
   const penalty = Number.isFinite(block.penalty) ? block.penalty : 0;
   const reasons = Array.isArray(block.reasons) ? block.reasons : [];
   const reasonsContent = reasons.length
-    ? reasons.map((reasonText) => renderReason(reasonText)).join("")
+    ? reasons.map((reason) => renderReason(reason)).join("")
     : `<div class="penaltyMeta">Sem penalizações relevantes.</div>`;
 
   return `
@@ -170,8 +172,10 @@ function buildPenaltyCard(label, block) {
   `;
 }
 
-function renderReason(reasonText) {
-  const code = LM_REASON_MAP_V13?.[reasonText];
+function renderReason(reason) {
+  const reasonText = getReasonText(reason);
+  const reasonCode = typeof reason === "object" && reason ? reason.code : null;
+  const code = reasonCode || LM_REASON_MAP_V13?.[reasonText];
   const reasonCopy = code ? LM_REASON_COPY_V13?.reasons?.[code] : null;
 
   if (!reasonCopy) {
@@ -186,6 +190,14 @@ function renderReason(reasonText) {
       <div class="penaltyMeta"><strong>Evite:</strong> ${escapeHtml(reasonCopy.dontDo)}</div>
     </div>
   `;
+}
+
+function getReasonText(reason) {
+  if (typeof reason === "string") return reason;
+  if (reason && typeof reason === "object") {
+    return typeof reason.text === "string" ? reason.text : String(reason.text ?? "");
+  }
+  return String(reason ?? "");
 }
 
 function escapeHtml(str) {

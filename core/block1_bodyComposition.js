@@ -9,6 +9,7 @@
 export function block1BodyComposition(d) {
   let penalty = 0;
   const reasons = [];
+  const block = "body";
 
   const bmi = calcBMI(d.weight, d.height);
 
@@ -23,26 +24,46 @@ export function block1BodyComposition(d) {
   if (bmi >= 35) {
     penalty += 30;
     reasons.push(
-      "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade."
+      {
+        code: "B1_OBESITY_GRADE_II_PLUS",
+        text: "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade.",
+        block
+      }
     );
   } else if (bmi >= 30) {
     penalty += 20;
     reasons.push(
-      "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora."
+      {
+        code: "B1_OBESITY_GRADE_I",
+        text: "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora.",
+        block
+      }
     );
   } else if (bmi >= 25) {
     penalty += bfHigh ? 10 : 5;
     reasons.push(
       bfHigh
-        ? "Sobrepeso com gordura elevada sugere risco metabólico moderado."
-        : "Sobrepeso leve: risco metabólico pode exigir ajustes graduais."
+        ? {
+            code: "B1_OVERWEIGHT_HIGH_BODY_FAT",
+            text: "Sobrepeso com gordura elevada sugere risco metabólico moderado.",
+            block
+          }
+        : {
+            code: "B1_OVERWEIGHT_MILD",
+            text: "Sobrepeso leve: risco metabólico pode exigir ajustes graduais.",
+            block
+          }
     );
   }
 
   if (d.age >= 45) {
     penalty += 5;
     reasons.push(
-      "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco)."
+      {
+        code: "B1_AGE_CAUTION",
+        text: "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco).",
+        block
+      }
     );
   }
 
@@ -51,7 +72,11 @@ export function block1BodyComposition(d) {
 
   // Se não tem BF: educar (sem inventar 0%)
   if (!hasBodyFat) {
-    reasons.push("Sem % de gordura: risco metabólico é estimado com menor precisão.");
+    reasons.push({
+      code: "B1_BODY_FAT_MISSING",
+      text: "Sem % de gordura: risco metabólico é estimado com menor precisão.",
+      block
+    });
   }
 
   return {

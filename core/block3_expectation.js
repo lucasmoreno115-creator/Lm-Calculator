@@ -10,6 +10,7 @@
 export function block3Expectation(d, b1, b2) {
   let penalty = 0;
   const reasons = [];
+  const block = "expectation";
 
   const isFast = d.expectation === "fast";
   if (!isFast) {
@@ -22,7 +23,11 @@ export function block3Expectation(d, b1, b2) {
 
   // Base
  penalty += 15;
-reasons.push("Expectativa agressiva aumenta risco de frustração e abandono.");
+reasons.push({
+  code: "B3_EXPECTATION_AGGRESSIVE",
+  text: "Expectativa agressiva aumenta risco de frustração e abandono.",
+  block
+});
 
 const lowActivityContext =
   d.activityLevel === "sedentary" || d.trainingFrequency < 3;
@@ -30,7 +35,11 @@ const lowActivityContext =
 if (lowActivityContext) {
   penalty += 10;
   reasons.push(
-    "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha."
+    {
+      code: "B3_FAST_EXPECTATION_LOW_ACTIVITY",
+      text: "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha.",
+      block
+    }
   );
 }
   
@@ -41,7 +50,11 @@ if (lowActivityContext) {
   if (incompatible) {
     penalty = 30;
     reasons.push(
-      "Expectativa incompatível com o nível atual: primeiro estabilizar rotina e consistência."
+      {
+        code: "B3_EXPECTATION_INCOMPATIBLE",
+        text: "Expectativa incompatível com o nível atual: primeiro estabilizar rotina e consistência.",
+        block
+      }
     );
   }
 
