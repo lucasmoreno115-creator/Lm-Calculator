@@ -8,6 +8,8 @@
 
 import { calculateLMScore } from "./core/lmScoreEngine.js";
 import { LM_COPY_V11 } from "./core/lmCopy_v1_1.js";
+import { LM_REASON_MAP_V13 } from "./core/lmReasonMap_v1_3.js";
+import { LM_REASON_COPY_V13 } from "./core/lmReasonCopy_v1_3.js";
 
 const els = {
   calcBtn: document.getElementById("calcBtn"),
@@ -153,7 +155,9 @@ function buildPenaltyCard(label, block) {
 
   const penalty = Number.isFinite(block.penalty) ? block.penalty : 0;
   const reasons = Array.isArray(block.reasons) ? block.reasons : [];
-  const reasonsText = reasons.length ? reasons.join(" ") : "Sem penalizações relevantes.";
+  const reasonsContent = reasons.length
+    ? reasons.map((reasonText) => renderReason(reasonText)).join("")
+    : `<div class="penaltyMeta">Sem penalizações relevantes.</div>`;
 
   return `
     <div class="penaltyCard">
@@ -161,7 +165,25 @@ function buildPenaltyCard(label, block) {
         <span>${escapeHtml(label)}</span>
         <span class="penaltyScore">-${penalty} pts</span>
       </div>
-      <div class="penaltyMeta">${escapeHtml(reasonsText)}</div>
+      <div class="penaltyReasons">${reasonsContent}</div>
+    </div>
+  `;
+}
+
+function renderReason(reasonText) {
+  const code = LM_REASON_MAP_V13?.[reasonText];
+  const reasonCopy = code ? LM_REASON_COPY_V13?.reasons?.[code] : null;
+
+  if (!reasonCopy) {
+    return `<div class="penaltyMeta">${escapeHtml(reasonText)}</div>`;
+  }
+
+  return `
+    <div class="penaltyReason">
+      <div class="penaltyReasonTitle">${escapeHtml(reasonCopy.title)}</div>
+      <div class="penaltyMeta">${escapeHtml(reasonCopy.explanation)}</div>
+      <div class="penaltyMeta"><strong>Impacto:</strong> ${escapeHtml(reasonCopy.impact)}</div>
+      <div class="penaltyMeta"><strong>Evite:</strong> ${escapeHtml(reasonCopy.dontDo)}</div>
     </div>
   `;
 }

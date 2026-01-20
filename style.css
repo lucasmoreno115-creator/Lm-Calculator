@@ -120,6 +120,23 @@ pre{
   gap:10px;
 }
 
+.penaltyReasons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:8px;
+}
+
+.penaltyReason{
+  border-top:1px solid var(--border);
+  padding-top:8px;
+}
+
+.penaltyReasonTitle{
+  font-weight:700;
+  margin-bottom:4px;
+}
+
 .penaltyCard{
   border:1px solid var(--border);
   border-radius:12px;
