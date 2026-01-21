@@ -22,16 +22,21 @@ export function block3Expectation(d, b1, b2) {
 
   // Base
  penalty += 15;
-reasons.push("Expectativa agressiva aumenta risco de frustração e abandono.");
+reasons.push({
+  code: "ACTIVITY_SEDENTARY",
+  message: "Expectativa agressiva aumenta risco de frustração e abandono.",
+});
 
 const lowActivityContext =
   d.activityLevel === "sedentary" || d.trainingFrequency < 3;
 
 if (lowActivityContext) {
   penalty += 10;
-  reasons.push(
-    "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha."
-  );
+  reasons.push({
+    code: "ACTIVITY_LIGHT",
+    message:
+      "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha.",
+  });
 }
   
   // Incompatível = combinação “ruim + ruim”
@@ -40,9 +45,11 @@ if (lowActivityContext) {
 
   if (incompatible) {
     penalty = 30;
-    reasons.push(
-      "Expectativa incompatível com o nível atual: primeiro estabilizar rotina e consistência."
-    );
+    reasons.push({
+      code: "ACTIVITY_MODERATE_INCONSISTENT",
+      message:
+        "Expectativa incompatível com o nível atual: primeiro estabilizar rotina e consistência.",
+    });
   }
 
   // Teto do bloco
