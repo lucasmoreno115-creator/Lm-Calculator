@@ -22,28 +22,35 @@ export function block1BodyComposition(d) {
   // Penalização por categoria (aproxima o lock)
   if (bmi >= 35) {
     penalty += 30;
-    reasons.push(
-      "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade."
-    );
+    reasons.push({
+      code: "ACTIVITY_SEDENTARY",
+      message:
+        "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade.",
+    });
   } else if (bmi >= 30) {
     penalty += 20;
-    reasons.push(
-      "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora."
-    );
+    reasons.push({
+      code: "ACTIVITY_LIGHT",
+      message:
+        "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora.",
+    });
   } else if (bmi >= 25) {
     penalty += bfHigh ? 10 : 5;
-    reasons.push(
-      bfHigh
+    reasons.push({
+      code: bfHigh ? "TRAINING_FREQUENCY_LOW" : "STRENGTH_TRAINING_MISSING",
+      message: bfHigh
         ? "Sobrepeso com gordura elevada sugere risco metabólico moderado."
-        : "Sobrepeso leve: risco metabólico pode exigir ajustes graduais."
-    );
+        : "Sobrepeso leve: risco metabólico pode exigir ajustes graduais.",
+    });
   }
 
   if (d.age >= 45) {
     penalty += 5;
-    reasons.push(
-      "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco)."
-    );
+    reasons.push({
+      code: "ACTIVITY_MODERATE_INCONSISTENT",
+      message:
+        "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco).",
+    });
   }
 
   // Teto do bloco
@@ -51,7 +58,10 @@ export function block1BodyComposition(d) {
 
   // Se não tem BF: educar (sem inventar 0%)
   if (!hasBodyFat) {
-    reasons.push("Sem % de gordura: risco metabólico é estimado com menor precisão.");
+    reasons.push({
+      code: "ACTIVITY_SEDENTARY",
+      message: "Sem % de gordura: risco metabólico é estimado com menor precisão.",
+    });
   }
 
   return {
