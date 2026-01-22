@@ -32,13 +32,6 @@ function assertContractReasons(label, result) {
   }
 
   result.reasons.forEach((reason, index) => {
-    if (typeof reason === "string") {
-      if (!/\S/.test(reason)) {
-        throw new Error(`[FAIL] ${label}: reason[${index}] string vazia`);
-      }
-      return;
-    }
-
     if (reason && typeof reason === "object") {
       const hasCode = typeof reason.code === "string" && reason.code.length > 0;
       const hasMessage =
