@@ -22,6 +22,45 @@ import { LM_WEIGHTS_V12 } from "./weights.config.js";
 
 export const LM_CORE_VERSION = "0.8.2";
 
+const LM_REASON_COPY_V1_3 = {
+  BODYCOMP_OBESITY_GRADE_2_PLUS:
+    "Obesidade grau II+ aumenta risco metabólico e reduz tolerância a agressividade.",
+  BODYCOMP_OBESITY_GRADE_1:
+    "Obesidade grau I sugere maior risco metabólico e exige estratégia conservadora.",
+  BODYCOMP_OVERWEIGHT_HIGH_BF:
+    "Sobrepeso com gordura elevada sugere risco metabólico moderado.",
+  BODYCOMP_OVERWEIGHT_LIGHT:
+    "Sobrepeso leve: risco metabólico pode exigir ajustes graduais.",
+  BODYCOMP_AGE_CAUTION:
+    "Idade aumenta a necessidade de cautela metabólica (estratégias agressivas elevam risco).",
+  BODYCOMP_NO_BODYFAT_ESTIMATE:
+    "Sem % de gordura: risco metabólico é estimado com menor precisão.",
+  ACTIVITY_SEDENTARY:
+    "Sedentarismo reduz eficiência do déficit e aumenta dificuldade de adesão.",
+  ACTIVITY_LIGHT:
+    "Baixa atividade limita ritmo de progresso e aumenta dependência de dieta perfeita.",
+  ACTIVITY_LOW_FREQUENCY:
+    "Treino <3x/sem reduz estímulo mínimo para progresso consistente.",
+  ACTIVITY_NO_STRENGTH:
+    "Sem musculação: maior risco de perder massa magra e piorar composição corporal.",
+  ACTIVITY_MODERATE_INCONSISTENT:
+    "Atividade moderada exige consistência (frequência e musculação) para ser real na prática.",
+  EXPECTATION_AGGRESSIVE:
+    "Expectativa agressiva aumenta risco de frustração e abandono.",
+  EXPECTATION_FAST_LOW_ACTIVITY:
+    "Expectativa rápida com baixa atividade reduz previsibilidade e aumenta risco de falha.",
+  EXPECTATION_INCOMPATIBLE:
+    "Expectativa incompatível com o nível atual: primeiro estabilizar rotina e consistência.",
+};
+
+const LM_REASON_CODE_BY_MESSAGE = Object.entries(LM_REASON_COPY_V1_3).reduce(
+  (acc, [code, message]) => {
+    acc[message] = code;
+    return acc;
+  },
+  {}
+);
+
 /**
  * API pública do core
  * @param {object} input
@@ -60,6 +99,12 @@ export function calculateLMScore(input, options = {}) {
   const totalPenalty = clamp(totalPenaltyRaw, 0, 60);
   const score = clamp(100 - totalPenalty, 40, 100);
 
+  const normalizedBlocks = {
+    body: { ...b1, reasons: normalizeReasonsArray(b1.reasons) },
+    activity: { ...b2, reasons: normalizeReasonsArray(b2.reasons) },
+    expectation: { ...b3, reasons: normalizeReasonsArray(b3.reasons) },
+  };
+
   return {
     version: LM_CORE_VERSION,
     mode,
@@ -70,14 +115,14 @@ export function calculateLMScore(input, options = {}) {
 
     // Razões educacionais (flat)
     reasons: [
-      ...(Array.isArray(b1.reasons) ? b1.reasons : []),
-      ...(Array.isArray(b2.reasons) ? b2.reasons : []),
-      ...(Array.isArray(b3.reasons) ? b3.reasons : []),
+      ...normalizedBlocks.body.reasons,
+      ...normalizedBlocks.activity.reasons,
+      ...normalizedBlocks.expectation.reasons,
     ],
 
     // Debug por bloco + totais
     blocks: {
-      ...blocks,
+      ...normalizedBlocks,
       totalPenalty,
       totalPenaltyLegacy,
     },
@@ -94,6 +139,33 @@ function classify(score) {
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
+}
+
+function normalizeReason(reason) {
+  if (reason && typeof reason === "object") {
+    if (typeof reason.code === "string" && reason.code.length > 0) {
+      if (typeof reason.message === "string" && reason.message.length > 0) {
+        return reason;
+      }
+    }
+    throw new Error("[LM] Invalid reason object format.");
+  }
+
+  if (typeof reason === "string") {
+    const code = LM_REASON_CODE_BY_MESSAGE[reason];
+    if (!code) {
+      throw new Error("[LM] Unknown reason string format.");
+    }
+    return { code, message: reason };
+  }
+
+  throw new Error("[LM] Invalid reason format.");
+}
+
+function normalizeReasonsArray(reasons) {
+  return (Array.isArray(reasons) ? reasons : []).map((reason) =>
+    normalizeReason(reason)
+  );
 }
 
 /**

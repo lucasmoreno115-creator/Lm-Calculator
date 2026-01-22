@@ -4,12 +4,8 @@ import { fileURLToPath } from "node:url";
 
 import { calculateLMScore } from "../core/lmScoreEngine.js";
 
-const ENGINE_IMPORT_PATH = "../core/lmScoreEngine.js";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-let engineImportLogged = false;
 
 function readJson(file) {
   const full = path.join(__dirname, file);
@@ -73,22 +69,6 @@ export function runContractTests() {
   for (const c of cases) {
     try {
       const { result, label } = runScenario(c.file, c.label);
-      if (!engineImportLogged) {
-        console.error("[LM CONTRACT] Engine import:", ENGINE_IMPORT_PATH);
-        engineImportLogged = true;
-      }
-
-      const stringReasons = Array.isArray(result.reasons)
-        ? result.reasons.filter((reason) => typeof reason === "string")
-        : [];
-      if (stringReasons.length) {
-        console.error("[LM CONTRACT] String reasons detected", {
-          scenario: label,
-          count: stringReasons.length,
-          examples: stringReasons.slice(0, 3),
-          types: stringReasons.slice(0, 3).map((reason) => typeof reason),
-        });
-      }
       assertContractScore(label, result);
       assertContractReasons(label, result);
     } catch (e) {
