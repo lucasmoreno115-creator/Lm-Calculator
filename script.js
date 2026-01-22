@@ -89,16 +89,17 @@ function pickBand(score) {
 
 function buildEducationalText(result) {
   const band = pickBand(result.score);
+  const reasonTexts = getReasonTexts(result.reasons);
 
   // Fallback seguro (se copy faltar por algum motivo)
   if (!band) {
-    return result.reasons?.length
-      ? result.reasons.join(" ")
+    return reasonTexts.length
+      ? reasonTexts.join(" ")
       : "Nenhum fator de risco relevante identificado.";
   }
 
   // Mostra 1–2 razões principais (se existirem), para não ficar genérico
-  const topReasons = Array.isArray(result.reasons) ? result.reasons.slice(0, 2) : [];
+  const topReasons = reasonTexts.slice(0, 2);
   const reasonsLine = topReasons.length ? `Principal fator: ${topReasons.join(" ")}` : null;
 
   const nextSteps = band.nextSteps.map((s) => `• ${s}`).join("\n");
@@ -153,7 +154,8 @@ function buildPenaltyCard(label, block) {
 
   const penalty = Number.isFinite(block.penalty) ? block.penalty : 0;
   const reasons = Array.isArray(block.reasons) ? block.reasons : [];
-  const reasonsText = reasons.length ? reasons.join(" ") : "Sem penalizações relevantes.";
+  const reasonsText = buildReasonsHtml(reasons);
+  const reasonsFallback = reasons.length ? "" : "Sem penalizações relevantes.";
 
   return `
     <div class="penaltyCard">
@@ -161,9 +163,57 @@ function buildPenaltyCard(label, block) {
         <span>${escapeHtml(label)}</span>
         <span class="penaltyScore">-${penalty} pts</span>
       </div>
-      <div class="penaltyMeta">${escapeHtml(reasonsText)}</div>
+      <div class="penaltyMeta">${reasonsText || escapeHtml(reasonsFallback)}</div>
     </div>
   `;
+}
+
+function getReasonTexts(reasons) {
+  return (Array.isArray(reasons) ? reasons : [])
+    .map((reason) => formatReasonText(reason))
+    .filter((reasonText) => reasonText !== "");
+}
+
+function formatReasonText(reason) {
+  if (reason && typeof reason === "object") {
+    if (!reason.code) {
+      console.warn("[LM] Reason object missing code:", reason);
+    }
+
+    return typeof reason.message === "string" ? reason.message : "";
+  }
+
+  if (typeof reason === "string") {
+    // DEPRECATED (v1.5): fallback por texto será removido quando 100% dos reasons vierem com code do core.
+    return reason;
+  }
+
+  return "";
+}
+
+function buildReasonsHtml(reasons) {
+  return (Array.isArray(reasons) ? reasons : [])
+    .map((reason) => {
+      if (reason && typeof reason === "object") {
+        if (!reason.code) {
+          console.warn("[LM] Reason object missing code:", reason);
+        }
+
+        const message = typeof reason.message === "string" ? reason.message : "";
+        const codeAttr = reason.code ? ` data-reason-code="${escapeHtml(reason.code)}"` : "";
+
+        return `<span${codeAttr}>${escapeHtml(message)}</span>`;
+      }
+
+      if (typeof reason === "string") {
+        // DEPRECATED (v1.5): fallback por texto será removido quando 100% dos reasons vierem com code do core.
+        return `<span>${escapeHtml(reason)}</span>`;
+      }
+
+      return "";
+    })
+    .filter((reasonHtml) => reasonHtml !== "")
+    .join(" ");
 }
 
 function escapeHtml(str) {
@@ -173,6 +223,56 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function extractReasonCodes(reasons) {
+  const summary = {
+    codes: [],
+    missingCodeCount: 0,
+    stringFallbackCount: 0,
+  };
+
+  if (!Array.isArray(reasons)) {
+    return summary;
+  }
+
+  reasons.forEach((reason) => {
+    if (reason && typeof reason === "object") {
+      if (typeof reason.code === "string" && reason.code.length > 0) {
+        summary.codes.push(reason.code);
+      } else {
+        summary.missingCodeCount += 1;
+      }
+      return;
+    }
+
+    if (typeof reason === "string") {
+      summary.stringFallbackCount += 1;
+    }
+  });
+
+  return summary;
+}
+
+function buildCodeHistogram(codes) {
+  return codes.reduce((acc, code) => {
+    acc[code] = (acc[code] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function renderDebugPayload(payload) {
+  if (!els.result) return;
+
+  let debugEl = document.getElementById("lm-debug");
+  if (!debugEl) {
+    debugEl = document.createElement("pre");
+    debugEl.id = "lm-debug";
+    debugEl.style.display = "none";
+    els.result.appendChild(debugEl);
+  }
+
+  debugEl.textContent = JSON.stringify(payload, null, 2);
 }
 
 // -------------------------------
@@ -190,6 +290,28 @@ function renderResult(result) {
 
   // Transparência: penalizações por bloco
   renderPenalties(result);
+
+  const reasonSummary = extractReasonCodes(result.reasons);
+  const codeCounts = buildCodeHistogram(reasonSummary.codes);
+  const debugPayload = {
+    score: result.score,
+    riskLabel: result.classification,
+    codes: reasonSummary.codes,
+    counts: codeCounts,
+    missingCodeCount: reasonSummary.missingCodeCount,
+    stringFallbackCount: reasonSummary.stringFallbackCount,
+    version: result.version || "v1.6-ui-observability",
+  };
+
+  console.groupCollapsed("[LM] Debug payload");
+  console.log(debugPayload);
+  console.groupEnd();
+
+  renderDebugPayload({
+    score: debugPayload.score,
+    codes: debugPayload.codes,
+    counts: debugPayload.counts,
+  });
 
   // Debug completo (continua para QA)
   if (els.debug) {
