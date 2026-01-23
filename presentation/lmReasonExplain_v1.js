@@ -63,4 +63,52 @@ export const LM_REASON_EXPLAIN_V1 = {
       "Foque em hábitos consistentes e metas progressivas ao longo do tempo.",
     prioridade: 2,
   },
+  BODYCOMP_OVERWEIGHT_LIGHT: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "Seu ponto de partida pede atenção leve e ajustes simples no começo.",
+    acaoRecomendada:
+      "Faça pequenas melhorias na rotina e avance em passos curtos e consistentes.",
+    prioridade: 3,
+  },
+  BODYCOMP_AGE_CAUTION: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "Este é um momento em que vale começar com mais cuidado e constância.",
+    acaoRecomendada:
+      "Comece devagar, mantenha regularidade e ajuste o ritmo com calma.",
+    prioridade: 3,
+  },
+  BODYCOMP_NO_BODYFAT_ESTIMATE: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "Falta um dado que ajudaria a dar mais contexto ao seu ponto de partida.",
+    acaoRecomendada:
+      "Quando possível, traga essa informação para personalizar melhor a orientação.",
+    prioridade: 3,
+  },
+  ACTIVITY_LOW_FREQUENCY: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "A frequência atual de atividade é baixa e pode dificultar a constância.",
+    acaoRecomendada:
+      "Tente aumentar aos poucos a frequência, com metas simples e realistas.",
+    prioridade: 3,
+  },
+  ACTIVITY_NO_STRENGTH: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "Falta um tipo de atividade que costuma ajudar na rotina e no progresso.",
+    acaoRecomendada:
+      "Considere incluir exercícios de força de forma gradual e confortável.",
+    prioridade: 3,
+  },
+  ACTIVITY_MODERATE_INCONSISTENT: {
+    impacto: "baixo",
+    explicacaoCliente:
+      "Há uma diferença entre o nível de atividade desejado e a prática atual.",
+    acaoRecomendada:
+      "Ajuste a rotina para combinar frequência e regularidade de forma viável.",
+    prioridade: 3,
+  },
 };
