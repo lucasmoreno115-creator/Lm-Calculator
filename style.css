@@ -83,6 +83,81 @@ button{
   border-bottom:1px solid var(--border);
 }
 
+.resultMeta{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+  font-size:0.85rem;
+  color:var(--muted);
+}
+
+.versionLabel{
+  font-weight:600;
+}
+
+.reasonSummary,
+.reasonGroups{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.reasonGroup{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+}
+
+.reasonGroupTitle{
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.reasonItem{
+  border-top:1px solid var(--border);
+  padding-top:8px;
+  margin-top:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.reasonItem:first-child{
+  border-top:none;
+  padding-top:0;
+  margin-top:0;
+}
+
+.reasonMeta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:0.75rem;
+  background:#f3f4f6;
+  color:#111827;
+  border:1px solid var(--border);
+}
+
+.reasonText{
+  color:var(--text);
+  line-height:1.35;
+}
+
+.reasonAction{
+  color:var(--muted);
+  line-height:1.35;
+}
+
 .debug{
   margin-top:14px;
 }

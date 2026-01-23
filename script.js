@@ -8,6 +8,7 @@
 
 import { calculateLMScore } from "./core/lmScoreEngine.js";
 import { LM_COPY_V11 } from "./core/lmCopy_v1_1.js";
+import { LM_REASON_EXPLAIN_V1 } from "./presentation/lmReasonExplain_v1.js";
 
 const els = {
   calcBtn: document.getElementById("calcBtn"),
@@ -16,6 +17,10 @@ const els = {
   classification: document.getElementById("classification"),
   mainFactor: document.getElementById("mainFactor"),
   penalties: document.getElementById("penalties"),
+  versionLabel: document.getElementById("versionLabel"),
+  resultDate: document.getElementById("resultDate"),
+  topImpacts: document.getElementById("topImpacts"),
+  groupedReasons: document.getElementById("groupedReasons"),
   debug: document.getElementById("debug"),
 };
 
@@ -256,6 +261,120 @@ function buildCodeHistogram(codes) {
   }, {});
 }
 
+function getImpactRank(impacto) {
+  if (impacto === "alto") return 0;
+  if (impacto === "médio") return 1;
+  if (impacto === "baixo") return 2;
+  return 3;
+}
+
+function getGroupLabel(code) {
+  if (code.startsWith("BODYCOMP_")) return "Composição corporal";
+  if (code.startsWith("ACTIVITY_")) return "Atividade";
+  if (code.startsWith("EXPECTATION_")) return "Expectativa";
+  return "Outros";
+}
+
+function buildExplainData(reason, index) {
+  if (!reason || typeof reason !== "object") {
+    throw new Error("[LM] Invalid reason format in v2.0");
+  }
+
+  if (typeof reason.code !== "string" || reason.code.length === 0) {
+    throw new Error("[LM] Invalid reason format in v2.0");
+  }
+
+  if (typeof reason.message !== "string" || reason.message.length === 0) {
+    throw new Error("[LM] Invalid reason format in v2.0");
+  }
+
+  const explain = LM_REASON_EXPLAIN_V1[reason.code];
+  if (!explain) {
+    return {
+      code: reason.code,
+      impacto: "—",
+      explicacaoCliente: `Motivo identificado (código: ${reason.code}). Recomendação indisponível nesta versão.`,
+      acaoRecomendada: "Recomendação indisponível nesta versão.",
+      prioridade: "—",
+      group: getGroupLabel(reason.code),
+      index,
+    };
+  }
+
+  return {
+    code: reason.code,
+    impacto: explain.impacto,
+    explicacaoCliente: explain.explicacaoCliente,
+    acaoRecomendada: explain.acaoRecomendada,
+    prioridade: explain.prioridade,
+    group: getGroupLabel(reason.code),
+    index,
+  };
+}
+
+function sortExplainData(a, b) {
+  const priorityA = typeof a.prioridade === "number" ? a.prioridade : 99;
+  const priorityB = typeof b.prioridade === "number" ? b.prioridade : 99;
+
+  if (priorityA !== priorityB) return priorityA - priorityB;
+
+  const impactA = getImpactRank(a.impacto);
+  const impactB = getImpactRank(b.impacto);
+
+  if (impactA !== impactB) return impactA - impactB;
+
+  return a.index - b.index;
+}
+
+function renderReasonList(items) {
+  if (!items.length) {
+    return `<div class="reasonGroup"><div class="reasonText muted">Nenhum motivo identificado.</div></div>`;
+  }
+
+  return items
+    .map((item) => {
+      const impactoLabel = item.impacto === "—" ? "Impacto indisponível" : `Impacto: ${item.impacto}`;
+      const prioridadeLabel =
+        item.prioridade === "—" ? "Prioridade indisponível" : `Prioridade: ${item.prioridade}`;
+
+      return `
+        <div class="reasonItem">
+          <div class="reasonMeta">
+            <span class="badge">${escapeHtml(impactoLabel)}</span>
+            <span class="badge">${escapeHtml(prioridadeLabel)}</span>
+            <span class="badge">${escapeHtml(item.code)}</span>
+          </div>
+          <div class="reasonText">${escapeHtml(item.explicacaoCliente)}</div>
+          <div class="reasonAction">${escapeHtml(item.acaoRecomendada)}</div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderReasonGroups(items) {
+  const groups = items.reduce((acc, item) => {
+    if (!acc[item.group]) acc[item.group] = [];
+    acc[item.group].push(item);
+    return acc;
+  }, {});
+
+  const orderedGroups = ["Composição corporal", "Atividade", "Expectativa", "Outros"];
+
+  return orderedGroups
+    .filter((groupName) => groups[groupName] && groups[groupName].length)
+    .map((groupName) => {
+      const groupItems = groups[groupName].slice().sort(sortExplainData);
+      return `
+        <div class="reasonGroup">
+          <div class="reasonGroupTitle">${escapeHtml(groupName)}</div>
+          ${renderReasonList(groupItems)}
+        </div>
+      `;
+    })
+    .join("");
+}
+
 function renderDebugPayload(payload) {
   if (!els.result) return;
 
@@ -283,6 +402,12 @@ function renderResult(result) {
 
   els.score.textContent = String(result.score);
   els.classification.textContent = result.classification;
+  if (els.versionLabel) {
+    els.versionLabel.textContent = "LM Score v2.0.0";
+  }
+  if (els.resultDate) {
+    els.resultDate.textContent = new Date().toLocaleDateString();
+  }
 
   if (!Array.isArray(result?.reasons)) {
     console.warn("[LM] Result reasons is not an array:", result?.reasons);
@@ -295,6 +420,18 @@ function renderResult(result) {
 
   // Transparência: penalizações por bloco
   renderPenalties(normalizedResult);
+
+  const explainItems = reasonsArray.map((reason, index) => buildExplainData(reason, index));
+  const sortedExplainItems = explainItems.slice().sort(sortExplainData);
+
+  if (els.topImpacts) {
+    const topItems = sortedExplainItems.slice(0, 3);
+    els.topImpacts.innerHTML = renderReasonList(topItems);
+  }
+
+  if (els.groupedReasons) {
+    els.groupedReasons.innerHTML = renderReasonGroups(sortedExplainItems);
+  }
 
   const reasonSummary = extractReasonCodes(reasonsArray);
   const codeCounts = buildCodeHistogram(reasonSummary.codes);

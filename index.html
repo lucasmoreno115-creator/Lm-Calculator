@@ -72,6 +72,11 @@
     <section id="result" class="card resultHidden">
       <h2>Resultado</h2>
 
+      <div class="resultMeta">
+        <span id="versionLabel" class="versionLabel"></span>
+        <span id="resultDate" class="resultDate"></span>
+      </div>
+
       <div class="resultLine">
         <span>LM Score</span>
         <strong id="score"></strong>
@@ -83,6 +88,12 @@
       </div>
 
       <p id="mainFactor" class="muted"></p>
+
+      <h3 class="subtleTitle">O que mais impacta agora</h3>
+      <div id="topImpacts" class="reasonSummary"></div>
+
+      <h3 class="subtleTitle">Detalhamento por área</h3>
+      <div id="groupedReasons" class="reasonGroups"></div>
 
       <h3 class="subtleTitle">Penalizações por bloco</h3>
       <div id="penalties" class="penalties"></div>
