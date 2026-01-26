@@ -8,13 +8,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="container">
-    <header class="card">
-      <h1>LM Calculator (Debug)</h1>
-      <p class="muted">Interface de QA. Core científico está em <code>/core</code>.</p>
-    </header>
+  <div id="appRoot">
+    <div id="loadingFallback" class="loadingFallback">
+      <h1>LM Calculator</h1>
+      <p>Carregando...</p>
+      <p class="bootStatusLine">Boot: aguardando script...</p>
+      <p id="bootStatus" class="bootStatusLine"></p>
+    </div>
+    <main class="container">
+      <header class="card debugOnly">
+        <h1>LM Calculator (Debug)</h1>
+        <p class="muted">Interface de QA. Core científico está em <code>/core</code>.</p>
+      </header>
 
-    <section class="card">
+    <section class="card debugOnly">
       <h2>Bloco 1 — Composição corporal</h2>
 
       <label for="sex">Sexo</label>
@@ -36,7 +43,7 @@
       <input id="bodyFat" type="number" min="0" max="60" placeholder="Ex: 18">
     </section>
 
-    <section class="card">
+    <section class="card debugOnly">
       <h2>Bloco 2 — Atividade física</h2>
 
       <label for="activityLevel">Nível de atividade (declaração)</label>
@@ -56,7 +63,7 @@
       </label>
     </section>
 
-    <section class="card">
+    <section class="card debugOnly">
       <h2>Bloco 3 — Expectativa</h2>
 
       <label for="expectation">Expectativa de resultado</label>
@@ -72,6 +79,11 @@
     <section id="result" class="card resultHidden">
       <h2>Resultado</h2>
 
+      <div class="resultMeta">
+        <span id="versionLabel" class="versionLabel"></span>
+        <span id="resultDate" class="resultDate"></span>
+      </div>
+
       <div class="resultLine">
         <span>LM Score</span>
         <strong id="score"></strong>
@@ -84,17 +96,121 @@
 
       <p id="mainFactor" class="muted"></p>
 
-      <h3 class="subtleTitle">Penalizações por bloco</h3>
-      <div id="penalties" class="penalties"></div>
+      <h3 class="subtleTitle clientOnly">O que mais impacta agora</h3>
+      <div id="clientTopImpacts" class="clientSummary clientOnly"></div>
 
-      <details class="debug">
+      <details id="clientDetails" class="clientDetails clientOnly">
+        <summary>Ver detalhes</summary>
+        <div id="clientGroupedReasons" class="clientGroups"></div>
+      </details>
+
+      <h3 class="subtleTitle debugOnly">O que mais impacta agora (debug)</h3>
+      <div id="topImpacts" class="reasonSummary debugOnly"></div>
+
+      <h3 class="subtleTitle debugOnly">Detalhamento por área</h3>
+      <div id="groupedReasons" class="reasonGroups debugOnly"></div>
+
+      <button id="reportBtn" type="button" class="secondaryBtn">Gerar relatório (PDF)</button>
+
+      <section id="report" class="reportCard debugOnly">
+        <header class="reportHeader">
+          <div>
+            <h3>LM Score</h3>
+            <div class="reportMetaLine">
+              <span>LM Score v2.0.0</span>
+              <span id="reportDate"></span>
+            </div>
+          </div>
+          <div class="reportScore">
+            <div>
+              <div class="reportLabel">Score</div>
+              <div id="reportScore" class="reportValue"></div>
+            </div>
+            <div>
+              <div class="reportLabel">Classificação</div>
+              <div id="reportClassification" class="reportValue"></div>
+            </div>
+          </div>
+        </header>
+
+        <section class="reportSection">
+          <h4>O que mais impacta agora</h4>
+          <div id="reportTopImpacts" class="reportList"></div>
+        </section>
+
+        <section class="reportSection">
+          <h4>Detalhamento por área</h4>
+          <div id="reportGroups" class="reportGroups"></div>
+        </section>
+
+        <section class="reportSection">
+          <h4>Recomendações gerais</h4>
+          <ul class="reportList">
+            <li>Foco em consistência ao longo do tempo.</li>
+            <li>Reavaliação periódica para ajustar a rota.</li>
+            <li>Acompanhamento profissional quando possível.</li>
+          </ul>
+          <p class="reportNote">Reavaliação recomendada a cada 2–4 semanas.</p>
+          <p class="reportNote">
+            Os resultados dependem de consistência e adesão. Esta ferramenta apoia decisões, mas não garante resultados.
+          </p>
+        </section>
+
+        <section class="reportSection">
+          <h4>Disclaimer</h4>
+          <p class="reportDisclaimer">
+            Este relatório é educativo e informativo. Não constitui diagnóstico, tratamento ou prescrição.
+            Não substitui avaliação de um profissional habilitado. Não tome decisões exclusivamente com base neste resultado.
+          </p>
+        </section>
+
+        <section class="reportSection printOnly">
+          <h4>Observações do profissional</h4>
+          <div class="notesLines"></div>
+        </section>
+
+        <footer class="reportFooter">
+          <span id="reportFooterDate"></span>
+          <span>LM Score v2.0.0</span>
+          <span>Generated by LM Calculator</span>
+        </footer>
+      </section>
+
+      <h3 class="subtleTitle debugOnly">Penalizações por bloco</h3>
+      <div id="penalties" class="penalties debugOnly"></div>
+
+      <div class="uiDisclaimer">
+        <p>
+          Este relatório é educativo e informativo. Não constitui diagnóstico, tratamento ou prescrição.
+          Não substitui avaliação de um profissional habilitado. Não tome decisões exclusivamente com base neste resultado.
+        </p>
+        <p>Reavaliação recomendada a cada 2–4 semanas.</p>
+        <p>
+          Os resultados dependem de consistência e adesão. Esta ferramenta apoia decisões, mas não garante resultados.
+        </p>
+      </div>
+
+      <details class="debug debugOnly">
         <summary>Debug (JSON)</summary>
         <pre id="debug"></pre>
       </details>
+
+      <div class="modeToggle">
+        <span>Modo:</span>
+        <button type="button" id="modeClientBtn" class="modeBtn" data-mode="client">Cliente</button>
+        <span>|</span>
+        <button type="button" id="modeDebugBtn" class="modeBtn" data-mode="debug">Debug</button>
+      </div>
     </section>
   </main>
+  </div>
 
   <!-- IMPORTANTE: como o script usa import/export, precisa ser module -->
-  <script type="module" src="script.js"></script>
+  <script
+    type="module"
+    src="./script.js"
+    onload="(function(){var el=document.getElementById('bootStatus'); if(el){el.textContent='Boot: script carregado (HTML onload)';}})()"
+    onerror="(function(){var el=document.getElementById('bootStatus'); if(el){el.textContent='Boot: ERRO ao carregar ./script.js (HTML onerror)';}})()"
+  ></script>
 </body>
 </html>

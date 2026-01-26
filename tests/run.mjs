@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { calculateLMScore } from "../core/lmScoreEngine.js";
+import { runContractTests } from "./contractShape.test.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +66,8 @@ function main() {
       console.error(String(e?.message || e));
     }
   }
+
+  failures += runContractTests();
 
   if (failures) {
     console.error(`\n${failures} teste(s) falharam.`);
