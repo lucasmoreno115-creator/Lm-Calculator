@@ -8,11 +8,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="container">
-    <header class="card debugOnly">
-      <h1>LM Calculator (Debug)</h1>
-      <p class="muted">Interface de QA. Core científico está em <code>/core</code>.</p>
-    </header>
+  <div id="appRoot">
+    <main class="container">
+      <header class="card debugOnly">
+        <h1>LM Calculator (Debug)</h1>
+        <p class="muted">Interface de QA. Core científico está em <code>/core</code>.</p>
+      </header>
 
     <section class="card debugOnly">
       <h2>Bloco 1 — Composição corporal</h2>
@@ -196,6 +197,7 @@
       </div>
     </section>
   </main>
+  </div>
 
   <!-- IMPORTANTE: como o script usa import/export, precisa ser module -->
   <script type="module" src="script.js"></script>

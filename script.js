@@ -10,6 +10,7 @@ import { calculateLMScore } from "./core/lmScoreEngine.js";
 import { LM_COPY_V11 } from "./core/lmCopy_v1_1.js";
 import { LM_REASON_EXPLAIN_V1 } from "./presentation/lmReasonExplain_v1.js";
 
+const appRoot = document.getElementById("appRoot");
 const els = {
   calcBtn: document.getElementById("calcBtn"),
   result: document.getElementById("result"),
@@ -38,35 +39,81 @@ const els = {
 let lastResult = null;
 let currentMode = getStoredMode();
 
-applyUIMode(currentMode);
+function renderBootError() {
+  if (!appRoot) return;
+  appRoot.innerHTML = `
+    <div class="bootError">
+      <h2>❌ Erro ao carregar a interface</h2>
+      <p class="bootErrorCode">Código: UI-BOOT</p>
+      <div class="bootErrorActions">
+        <button type="button" id="bootReload">Recarregar</button>
+        <button type="button" id="bootResetMode">Resetar modo</button>
+      </div>
+    </div>
+  `;
 
-els.calcBtn.addEventListener("click", () => {
-  const data = collectFormData();
-  const errors = validateInput(data);
+  const reloadBtn = document.getElementById("bootReload");
+  const resetBtn = document.getElementById("bootResetMode");
 
-  if (errors.length) {
-    alert(errors.join("\n"));
-    return;
+  if (reloadBtn) {
+    reloadBtn.addEventListener("click", () => {
+      window.location.reload();
+    });
   }
 
-  const result = calculateLMScore(data);
-  lastResult = result;
-  renderResult(result);
-});
-
-if (els.reportBtn) {
-  els.reportBtn.addEventListener("click", () => {
-    window.print();
-  });
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      localStorage.removeItem("lm_ui_mode");
+      window.location.reload();
+    });
+  }
 }
 
-if (els.modeClientBtn && els.modeDebugBtn) {
-  els.modeClientBtn.addEventListener("click", () => {
-    setUIMode("client");
+function bootUI() {
+  applyUIMode(currentMode);
+
+  if (!els.calcBtn) {
+    throw new Error("[LM] Missing calculator button");
+  }
+
+  els.calcBtn.addEventListener("click", () => {
+    try {
+      const data = collectFormData();
+      const errors = validateInput(data);
+
+      if (errors.length) {
+        alert(errors.join("\n"));
+        return;
+      }
+
+      const result = calculateLMScore(data);
+      lastResult = result;
+      renderResultSafe(result);
+    } catch (error) {
+      renderBootError();
+    }
   });
-  els.modeDebugBtn.addEventListener("click", () => {
-    setUIMode("debug");
-  });
+
+  if (els.reportBtn) {
+    els.reportBtn.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
+  if (els.modeClientBtn && els.modeDebugBtn) {
+    els.modeClientBtn.addEventListener("click", () => {
+      setUIMode("client");
+    });
+    els.modeDebugBtn.addEventListener("click", () => {
+      setUIMode("debug");
+    });
+  }
+}
+
+try {
+  bootUI();
+} catch (error) {
+  renderBootError();
 }
 
 // -------------------------------
@@ -313,7 +360,7 @@ function setUIMode(mode) {
   localStorage.setItem("lm_ui_mode", currentMode);
   applyUIMode(currentMode);
   if (lastResult) {
-    renderResult(lastResult);
+    renderResultSafe(lastResult);
   }
 }
 
@@ -685,5 +732,18 @@ function renderResult(result) {
   // Debug completo (continua para QA)
   if (els.debug) {
     els.debug.textContent = JSON.stringify(result, null, 2);
+  }
+}
+
+function renderResultSafe(result, allowRetry = true) {
+  try {
+    renderResult(result);
+  } catch (error) {
+    if (currentMode === "client" && allowRetry) {
+      setUIMode("debug");
+      renderResultSafe(result, false);
+      return;
+    }
+    renderBootError();
   }
 }

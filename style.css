@@ -17,6 +17,10 @@ body{
   padding:16px;
 }
 
+#appRoot{
+  min-height:100vh;
+}
+
 .container{
   max-width:520px;
   margin:0 auto;
@@ -160,6 +164,37 @@ button{
 
 .mode-debug .clientOnly{
   display:none !important;
+}
+
+.bootError{
+  max-width:520px;
+  margin:40px auto;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+}
+
+.bootError h2{
+  margin:0 0 8px 0;
+  font-size:1.1rem;
+}
+
+.bootErrorCode{
+  color:var(--muted);
+  margin:0 0 16px 0;
+  font-size:0.85rem;
+}
+
+.bootErrorActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.bootErrorActions button{
+  width:auto;
+  margin:0;
 }
 
 .resultLine{
